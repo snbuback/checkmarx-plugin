@@ -436,6 +436,9 @@ public class CxScanBuilder extends Builder {
 				cxWebService.retrieveScanReport(reportResponse.getID(), pdfReportFile, CxWSReportType.PDF);
             }
 
+            instanceLogger.info("Copying reports to workspace");
+            copyReportsToWorkspace(build, checkmarxBuildDir);
+
             CxScanResult cxScanResult = addScanResultAction(build, serverUrlToUse, shouldRunAsynchronous, xmlReportFile);
 
             // Set scan results to environment
@@ -453,9 +456,6 @@ public class CxScanBuilder extends Builder {
 			}
 
             analyzeOpenSources(build, serverUrlToUseNotNull, usernameToUse, passwordToUse, projectId, cxWebService);
-
-            instanceLogger.info("Copying reports to workspace");
-            copyReportsToWorkspace(build, checkmarxBuildDir);
 
             return true;
 		} catch (IOException | WebServiceException e) {
