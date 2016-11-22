@@ -44,6 +44,7 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -390,6 +391,8 @@ public class CxScanBuilder extends Builder {
                 return true;
             }
 
+            updateEnvVar(build, listener);
+
             final String serverUrlToUse = isUseOwnServerCredentials() ? getServerUrl() : descriptor.getServerUrl();
             final String usernameToUse = isUseOwnServerCredentials() ? getUsername() : descriptor.getUsername();
             final String passwordToUse = isUseOwnServerCredentials() ? getPasswordPlainText() : descriptor.getPasswordPlainText();
@@ -479,6 +482,18 @@ public class CxScanBuilder extends Builder {
             closeLogger();
         }
 	}
+
+    private void updateEnvVar(final AbstractBuild<?, ?> build, final BuildListener listener) throws InterruptedException, IOException {
+        EnvVars env = build.getEnvironment(listener);
+
+        this.serverUrl = env.expand(serverUrl);
+        this.username = env.expand(username);
+        this.projectName = env.expand(projectName);
+        this.excludeFolders = env.expand(excludeFolders);
+        this.filterPattern = env.expand(filterPattern);
+        this.includeOpenSourceFolders = env.expand(includeOpenSourceFolders);
+        this.excludeOpenSourceFolders = env.expand(excludeOpenSourceFolders);
+    }
 
     private void copyReportsToWorkspace(AbstractBuild<?, ?> build, File checkmarxBuildDir) {
 
@@ -1058,16 +1073,18 @@ public class CxScanBuilder extends Builder {
 	     *  shared state to avoid synchronization issues.
 	     */
 
-		public FormValidation doCheckProjectName(@QueryParameter final String projectName, @QueryParameter final boolean useOwnServerCredentials,
-				@QueryParameter final String serverUrl, @QueryParameter final String username, @QueryParameter final String password,
-				@QueryParameter final String groupId, @QueryParameter final String timestamp) {
+		public FormValidation doCheckProjectName(@AncestorInPath AbstractProject project , @QueryParameter final String projectName, @QueryParameter final boolean useOwnServerCredentials,
+                                                 @QueryParameter final String serverUrl, @QueryParameter final String username, @QueryParameter final String password,
+                                                 @QueryParameter final String groupId, @QueryParameter final String timestamp) {
             // timestamp is not used in code, it is one of the arguments to invalidate Internet Explorer cache
 
             try {
                 final CxWebService cxWebService = prepareLoggedInWebservice(useOwnServerCredentials, serverUrl, username, getPasswordPlainText(password));
 
                 if (msGuid.matcher(groupId).matches()) {
-                    CxWSBasicRepsonse cxWSBasicRepsonse = cxWebService.validateProjectName(projectName, groupId);
+                    EnvVars ev = new EnvVars(project.getSomeBuildWithWorkspace().getEnvironment(null));
+                    String resolvedProjectName =  ev.expand(projectName);
+                    CxWSBasicRepsonse cxWSBasicRepsonse = cxWebService.validateProjectName(resolvedProjectName, groupId);
                     if (cxWSBasicRepsonse.isIsSuccesfull()) {
                         return FormValidation.ok("Project Name Validated Successfully");
                     } else {
