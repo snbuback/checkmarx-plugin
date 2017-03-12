@@ -2,11 +2,12 @@ package com.checkmarx.jenkins.logger;
 
 
 import hudson.WebAppMain;
-import hudson.model.BuildListener;
+import hudson.model.*;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -32,7 +33,7 @@ public class CxPluginLogger implements Serializable {
         this.loggingDevice = new JavaLoggingDevice();
     }
 
-    public CxPluginLogger(BuildListener listener) {
+    public CxPluginLogger(TaskListener listener) {
         this.loggingDevice = new ListenerLoggingDevice(listener);
     }
 
@@ -51,7 +52,7 @@ public class CxPluginLogger implements Serializable {
     }
 
     public void error(String message, Throwable error) {
-        loggingDevice.error( message+"\n\n"+ Arrays.toString(error.getStackTrace())+"\n\n");
+        loggingDevice.error( message, error);
     }
 
     private class JavaLoggingDevice implements LoggingDevice{
@@ -66,15 +67,20 @@ public class CxPluginLogger implements Serializable {
 
         @Override
         public void error(String message) {
-            STATIC_LOGGER.info(ERROR_PRE_TEXT + message);
+            STATIC_LOGGER.log(Level.SEVERE, ERROR_PRE_TEXT + message);
+        }
+
+        @Override
+        public void error(String message, Throwable t) {
+            STATIC_LOGGER.log(Level.SEVERE, ERROR_PRE_TEXT + message, t);
         }
     }
 
     private class ListenerLoggingDevice implements LoggingDevice{
 
-        private BuildListener listener;
+        private TaskListener listener;
 
-        public ListenerLoggingDevice(BuildListener listener) {
+        public ListenerLoggingDevice(TaskListener listener) {
             this.listener = listener;
         }
 
@@ -87,5 +93,11 @@ public class CxPluginLogger implements Serializable {
         public void error(String message) {
             this.listener.getLogger().println(ERROR_PRE_TEXT + message);
         }
+
+        @Override
+        public void error(String message, Throwable t) {
+            this.listener.getLogger().println(ERROR_PRE_TEXT + message + "\n\n"+ Arrays.toString(t.getStackTrace())+"\n\n");
+        }
+
     }
 }

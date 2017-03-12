@@ -6,8 +6,7 @@ import com.checkmarx.jenkins.filesystem.zip.callable.SastZipperCallable;
 import com.checkmarx.jenkins.filesystem.zip.dto.CxZipResult;
 import hudson.AbortException;
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
+import hudson.model.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -24,15 +23,18 @@ public class CxZip implements Serializable {
 
     private static String CANNOT_FIND_WORKSPACE = "Cannot acquire Jenkins workspace location. It can be due to workspace residing on a disconnected slave.";
 
-    private AbstractBuild<?, ?> build;
+    private Run<?, ?> build;
+    
+    private FilePath workspace;
 
-    public CxZip(final AbstractBuild<?, ?> build, final BuildListener listener) {
+    public CxZip(final Run<?, ?> build, FilePath workspace, final TaskListener listener) {
         this.build = build;
+        this.workspace = workspace;
         this.logger = new CxPluginLogger(listener);
     }
 
     public FilePath ZipWorkspaceFolder(String filterPattern) throws IOException, InterruptedException {
-        FilePath baseDir = build.getWorkspace();
+        FilePath baseDir = this.workspace;
         if (baseDir == null) {
             throw new AbortException(
                     "Checkmarx Scan Failed: "+CANNOT_FIND_WORKSPACE);
@@ -48,7 +50,7 @@ public class CxZip implements Serializable {
     }
 
     public FilePath zipSourceCode(String filterPattern) throws Exception {
-        FilePath baseDir = build.getWorkspace();
+        FilePath baseDir = this.workspace;
         if (baseDir == null) {
             throw new Exception(CANNOT_FIND_WORKSPACE);
         }

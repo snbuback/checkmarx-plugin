@@ -40,7 +40,7 @@ public class CxProjectResult implements Action {
     }
 
     public CxScanResult getLastSynchronousBuildAction() {
-        AbstractBuild<?, ?> r = this.owner.getLastBuild();
+        Run<?, ?> r = this.owner.getLastBuild();
         while (r != null) {
 
             CxScanResult a = r.getAction(CxScanResult.class);
@@ -101,7 +101,7 @@ public class CxProjectResult implements Action {
     }
 
     private CxScanResult getLastBuildAction() {
-        AbstractBuild<?, ?> r = this.owner.getLastBuild();
+        Run<?, ?> r = this.owner.getLastBuild();
         return r != null ? r.getAction(CxScanResult.class) : null;
     }
 

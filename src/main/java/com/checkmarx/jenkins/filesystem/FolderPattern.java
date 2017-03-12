@@ -2,8 +2,7 @@ package com.checkmarx.jenkins.filesystem;
 
 import com.checkmarx.jenkins.logger.CxPluginLogger;
 import hudson.EnvVars;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
+import hudson.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,10 +15,10 @@ public class FolderPattern {
 
     private transient CxPluginLogger logger;
 
-    private AbstractBuild<?, ?> build;
-    private BuildListener listener;
+    private Run<?, ?> build;
+    private TaskListener listener;
 
-    public FolderPattern(final AbstractBuild<?, ?> build, final BuildListener listener) {
+    public FolderPattern(final Run<?, ?> build, final TaskListener listener) {
         this.build = build;
         this.listener = listener;
         this.logger = new CxPluginLogger(listener);

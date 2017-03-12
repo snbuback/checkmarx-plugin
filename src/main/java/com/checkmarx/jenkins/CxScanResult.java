@@ -2,7 +2,6 @@ package com.checkmarx.jenkins;
 
 import com.checkmarx.jenkins.logger.CxPluginLogger;
 import hudson.PluginWrapper;
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.util.IOUtils;
@@ -26,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.checkmarx.jenkins.CxResultSeverity.*;
+import hudson.model.Run;
 
 /**
  * @author denis
@@ -35,7 +35,7 @@ public class CxScanResult implements Action {
 
     private transient CxPluginLogger logger = new CxPluginLogger();
 
-    public final AbstractBuild<?, ?> owner;
+    public final Run<?, ?> owner;
     private final long projectId;
     private final boolean scanRanAsynchronous;
     private String serverUrl;
@@ -89,7 +89,7 @@ public class CxScanResult implements Action {
     private Integer osaLowThreshold;
 
 
-    public CxScanResult(final AbstractBuild owner, String serverUrl, long projectId, boolean scanRanAsynchronous) {
+    public CxScanResult(final Run owner, String serverUrl, long projectId, boolean scanRanAsynchronous) {
         this.projectId = projectId;
         this.scanRanAsynchronous = scanRanAsynchronous;
         this.owner = owner;
@@ -350,7 +350,7 @@ public class CxScanResult implements Action {
      */
 
     public CxScanResult getPreviousResult() {
-        AbstractBuild<?, ?> b = owner;
+        Run<?, ?> b = owner;
         while (true) {
             b = b.getPreviousBuild();
             if (b == null) {
