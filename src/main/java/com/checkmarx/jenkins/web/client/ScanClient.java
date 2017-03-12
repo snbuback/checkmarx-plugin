@@ -49,7 +49,7 @@ public class ScanClient implements Closeable {
         root = client.target(serverUri.trim()).path(ROOT_PATH);
     }
 
-    public URI createScan(CreateScanRequest request) throws IOException {
+    public URI createScan(CreateScanRequest request) throws IOException, InterruptedException {
         final MultiPart multipart = createScanMultiPartRequest(request);
         Map<String, NewCookie> cookies = authenticate();
         Invocation invocation = root.path(ANALYZE_PATH)
@@ -85,7 +85,7 @@ public class ScanClient implements Closeable {
 
     }
 
-    private MultiPart createScanMultiPartRequest(CreateScanRequest request) throws IOException {
+    private MultiPart createScanMultiPartRequest(CreateScanRequest request) throws IOException, InterruptedException {
         InputStream read = request.getZipFile().read();
 
         final StreamDataBodyPart filePart = new StreamDataBodyPart (OSA_ZIPPED_FILE_KEY_NAME, read);

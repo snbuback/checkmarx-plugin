@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * @since 3/10/13
  */
 
-public class CxScanBuilder extends Builder {
+public class CxScanBuilder extends Builder /*implements SimpleBuildStep*/ {
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -1603,8 +1603,8 @@ public class CxScanBuilder extends Builder {
 
             return listBoxModel;
         }
-		
-		
+
+
 
 		/*
 		 * Note: This method is called concurrently by multiple threads, refrain from using mutable shared state to

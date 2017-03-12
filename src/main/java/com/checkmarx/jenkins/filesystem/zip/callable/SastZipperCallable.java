@@ -8,6 +8,9 @@ import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.jetbrains.annotations.NotNull;
+import org.jenkinsci.remoting.Role;
+import org.jenkinsci.remoting.RoleChecker;
+
 
 import java.io.*;
 import java.util.logging.Logger;
@@ -68,4 +71,9 @@ public class SastZipperCallable implements FilePath.FileCallable<CxZipResult>, S
             }
         }
     }
+
+    public void checkRoles(RoleChecker roleChecker) throws SecurityException {
+      roleChecker.check(this,Role.UNKNOWN);
+    }
+
 }

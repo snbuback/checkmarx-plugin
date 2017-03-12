@@ -78,7 +78,7 @@ public class OsaScanClient implements Closeable {
         cookies = login();
     }
 
-    public CreateScanResponse createScanLargeFileWorkaround(CreateScanRequest request) throws IOException {
+    public CreateScanResponse createScanLargeFileWorkaround(CreateScanRequest request) throws IOException, InterruptedException {
 
         //create httpclient
         CookieStore cookieStore = new BasicCookieStore();
@@ -139,7 +139,7 @@ public class OsaScanClient implements Closeable {
     }
 
 
-    public CreateScanResponse createScan(CreateScanRequest request) throws IOException {
+    public CreateScanResponse createScan(CreateScanRequest request) throws IOException, InterruptedException {
         final MultiPart multipart = createScanMultiPartRequest(request);
         logger.info("sending request for osa scan");
         Invocation invocation = root.path(ANALYZE_PATH)
@@ -251,7 +251,7 @@ public class OsaScanClient implements Closeable {
                 .header(CSRF_COOKIE, cookies.get(CSRF_COOKIE).getValue()).buildGet();
     }
 
-    private MultiPart createScanMultiPartRequest(CreateScanRequest request) throws IOException {
+    private MultiPart createScanMultiPartRequest(CreateScanRequest request) throws IOException, InterruptedException {
         InputStream read = request.getZipFile().read();
 
         final StreamDataBodyPart filePart = new StreamDataBodyPart(OSA_ZIPPED_FILE_KEY_NAME, read);

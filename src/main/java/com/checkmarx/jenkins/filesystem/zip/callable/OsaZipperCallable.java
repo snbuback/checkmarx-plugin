@@ -7,6 +7,8 @@ import com.checkmarx.jenkins.filesystem.zip.dto.ZippingDetails;
 import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
 import org.jetbrains.annotations.NotNull;
+import org.jenkinsci.remoting.Role;
+import org.jenkinsci.remoting.RoleChecker;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,5 +65,9 @@ public class OsaZipperCallable implements FilePath.FileCallable<CxZipResult>  {
                 LOGGER.warning("Fail to delete temp file: " + e.getMessage());
             }
         }
+    }
+
+    public void checkRoles(RoleChecker roleChecker) throws SecurityException {
+      roleChecker.check(this,Role.UNKNOWN);
     }
 }

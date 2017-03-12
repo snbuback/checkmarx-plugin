@@ -69,7 +69,7 @@ wsdl2java {
 
 jenkinsPlugin {
 	// version of Jenkins core this plugin depends on
-	coreVersion = '1.579'
+	coreVersion = '1.614'
 
 	// short name of the plugin, defaults to the project name without trailing '-plugin'
 	shortName = 'checkmarx'
@@ -98,7 +98,7 @@ jenkinsPlugin {
 	// the output directory for the localizer task relative to the project root, defaults to the value shown
 	localizerOutputDir = "${project.buildDir}/generated-src/localizer"
 
-	developers {	
+	developers {
 		developer {
 			id 'checkmarxsupport'
 			name 'Checkmarx Support'
